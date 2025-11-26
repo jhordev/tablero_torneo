@@ -1,8 +1,8 @@
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 
 // Initialize bracket data structure
-const bracket = ref({
+const defaultBracket = {
   roundOf16: [
     { team1: 'Hector Tarrillo', score1: 0, team2: 'Frank Rojas', score2: 0 },
     { team1: 'Julio Saavedra', score1: 0, team2: 'Alex Chuqui', score2: 0 },
@@ -24,7 +24,20 @@ const bracket = ref({
     { team1: '', score1: 0, team2: '', score2: 0 }
   ],
   final: { team1: '', score1: 0, team2: '', score2: 0 }
-})
+}
+
+// Load from localStorage or use default
+const loadBracket = () => {
+  const saved = localStorage.getItem('tournamentBracket')
+  return saved ? JSON.parse(saved) : defaultBracket
+}
+
+const bracket = ref(loadBracket())
+
+// Save to localStorage when bracket changes
+watch(bracket, (newBracket) => {
+  localStorage.setItem('tournamentBracket', JSON.stringify(newBracket))
+}, { deep: true })
 
 // Determine winner of a match
 const getWinner = (match) => {
